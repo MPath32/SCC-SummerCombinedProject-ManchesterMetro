@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +118,48 @@ public class MNetwork {
                 }
             }
         }
+        printRoute(start, end, previousStation, previousLine, minTimes);
     }
+
+    //Method to print the route by backtracking to have the path
+    private void printRoute(String start, String end, Map<String, String> previousStation, Map<String, String> previousLine, Map<String, Float> minTimes) {
+            if (!minTimes.containsKey(end)) {
+                System.out.println("No route found from " + start + " to " + end);
+                return;
+            }
+
+            //The main backtracking to build the path ting man i hate this
+            List<String> route = new ArrayList<>();
+            List<String> lines = new ArrayList<>();
+            String current = end;
+
+            while (current != null && !current.equals(start)) {
+                route.add(current);
+                lines.add(previousLine.get(current));
+                current = previousStation.get(current);
+            }
+            route.add(start);
+
+            Collections.reverse(route);
+            Collections.reverse(lines);
+
+            //Main format for printin the route FOR TASK 3
+            System.out.println("--- Best Route ---\n");
+            System.out.println("From: " + start + " To: " + end);
+            System.out.println("Total Time: " + minTimes.get(end) + " minutes\n");
+            String currentLine = lines.get(0);
+            System.out.println("Board the " + currentLine + " line at " + route.get(0));
+
+            for (int i = 1; i < route.size(); i++) {
+                System.out.println(" - " + route.get(i));
+                
+                if (i < lines.size() && !lines.get(i).equals(currentLine)) {
+                    currentLine = lines.get(i);
+                    System.out.println("\n*** Change to the " + currentLine + " line ***\n");
+                }
+            }
+            System.out.println("Arrive at " + end);
+            System.out.println("------------------\n");
+        }
 
 }
