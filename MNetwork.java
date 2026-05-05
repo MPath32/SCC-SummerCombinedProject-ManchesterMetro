@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class MNetwork {
     //Adjacency list used as it is for graph and allows effective connection storage
@@ -23,11 +24,10 @@ public class MNetwork {
         adjacencyList.putIfAbsent(fromN, new ArrayList<>());
         adjacencyList.putIfAbsent(toN, new ArrayList<>());
 
-        //Create connection and add to the "from" station
+        //Creatin connection and add to the "from" station
         Connection connection = new Connection(toN, time, colour);
         adjacencyList.get(fromN).add(connection);
     }
-
 
     //Method to read CSV and add connections
     public void readCSV(String filename){
@@ -61,9 +61,7 @@ public class MNetwork {
                 }
             }
 
-        //Success and Error messages
             System.out.println("Loaded successfully");
-
         }
 
         //Java will throw error without IOException with reading csv
@@ -71,4 +69,54 @@ public class MNetwork {
             System.err.println("Error reading file");
         } 
     }
+
+    //Method to find the shortest route
+    public void findShortestRoute(String start, String end){
+        //Tracking maps that keep minimum time, previous station and previous line colour
+        Map<String, Float> minTimes = new HashMap<>();
+        Map<String, String> previousStation = new HashMap<>();
+        Map<String, String> previousLine = new HashMap<>();
+
+        PriorityQueue<Node> queue = new PriorityQueue<>();
+
+        minTimes.put(start, 0.0f);
+        queue.add(new Node (start, 0.0f, null));
+
+        //Main algo
+        while(!queue.isEmpty()){
+            Node current = queue.poll();
+            String currentStation = current.getStationName();
+            String currentLine = current.getLineColour();
+
+            //Stop search if reach destination and skipping if faster route found
+            if(currentStation.equals(end)){
+                break;
+            }
+
+            if (current.getTotalTime() > minTimes.getOrDefault(currentStation, Float.MAX_VALUE)) {
+                continue;
+            }
+
+            //Checking all connections and if new path is faster choose it also adds time taken for walkingto the other line
+            if(adjacencyList.containsKey(currentStation)){
+                for(Connection conn : adjacencyList.get(currentStation)){
+                    String neighbour = conn.getDestination();
+                    String nextLine = conn.getLineColour();
+                    float newTime = current.getTotalTime() + conn.getTime();
+
+                    if (currentLine != null && !currentLine.equals(nextLine)){
+                        newTime += 2.0f;
+                    }
+
+                    if (newTime < minTimes.getOrDefault(neighbour, Float.MAX_VALUE)){
+                        minTimes.put(neighbour, newTime);
+                        previousStation.put(neighbour, currentStation);
+                        previousLine.put(neighbour, conn.getLineColour());
+                        queue.add(new Node(neighbour, newTime, nextLine));
+                    }
+                }
+            }
+        }
+    }
+
 }
