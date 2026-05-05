@@ -7,7 +7,7 @@ public class Node implements Comparable<Node>{
     private String lineColour;
 
     //Getter and setter methods
-    public Node(String stationName, float totalTime){
+    public Node(String stationName, float totalTime, String lineColour){
         this.stationName = stationName;
         this.totalTime = totalTime;
         this.lineColour = lineColour;
