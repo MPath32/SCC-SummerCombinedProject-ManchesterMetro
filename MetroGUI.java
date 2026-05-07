@@ -57,7 +57,8 @@ public class MetroGUI {
         //Shortest time constraint is auto selected
         shortTime = new JRadioButton("Shortest Time",true);
         fewestChange = new JRadioButton("Fewest Changes");
-
+        constraintsRadio.add(shortTime);
+        constraintsRadio.add(fewestChange);
         ButtonGroup constraints = new ButtonGroup();
         constraints.add(shortTime);
         constraints.add(fewestChange);
@@ -67,6 +68,8 @@ public class MetroGUI {
         JPanel button = new JPanel();
         JButton calcButton = new JButton("Calculate Route");
         calcButton.setBackground(new Color(124,252,0));
+        javax.swing.border.Border buttonLine = BorderFactory.createLineBorder(new Color(0,0,0), 2);
+        calcButton.setBorder(buttonLine);
         button.add(calcButton);
         calcButton.addActionListener(new ActionListener() {
             @Override
@@ -93,8 +96,8 @@ public class MetroGUI {
         String start = (String) startStationDropdown.getSelectedItem();
         String end = (String) endStationDropdown.getSelectedItem();
 
-        //Input validation that completes TASK 1, prevents no selection AND double selection of same station
-        if(start.equals("Please select starting station:")&& end.equals("Please select final station:")){
+        //Input validation that completes TASK 1, prevents no selection OR double selection of same station
+        if(start.equals("Please select starting station:")|| end.equals("Please select final station:")){
             JOptionPane.showMessageDialog(Mainframe, "Please select a valid station from the dropdown");
             return;
         }
