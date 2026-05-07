@@ -71,8 +71,13 @@ public class MNetwork {
         } 
     }
 
+    //Getter method that converts key of adjcency list into array so GUI dropdown menu contains names of all statiosn
+    public String[] getStationNames() {
+        return adjacencyList.keySet().stream().sorted().toArray(String[]::new);
+    }
+
     //Method to find the shortest route
-    public void findShortestRoute(String start, String end){
+    public void findShortestRoute(String start, String end, float walkPenalty){
         //Tracking maps that keep minimum time, previous station and previous line colour
         Map<String, Float> minTimes = new HashMap<>();
         Map<String, String> previousStation = new HashMap<>();
@@ -98,7 +103,7 @@ public class MNetwork {
                 continue;
             }
 
-            //Checking all connections and if new path is faster choose it also adds time taken for walkingto the other line
+            //Checking all connections and if new path is faster choose, sets walking time penalty as variable
             if(adjacencyList.containsKey(currentStation)){
                 for(Connection conn : adjacencyList.get(currentStation)){
                     String neighbour = conn.getDestination();
@@ -106,7 +111,7 @@ public class MNetwork {
                     float newTime = current.getTotalTime() + conn.getTime();
 
                     if (currentLine != null && !currentLine.equals(nextLine)){
-                        newTime += 2.0f;
+                        newTime += walkPenalty;
                     }
 
                     if (newTime < minTimes.getOrDefault(neighbour, Float.MAX_VALUE)){
@@ -121,14 +126,14 @@ public class MNetwork {
         printRoute(start, end, previousStation, previousLine, minTimes);
     }
 
-    //Method to print the route by backtracking to have the path
+    //Method to print the route by backtracking the path taken
     private void printRoute(String start, String end, Map<String, String> previousStation, Map<String, String> previousLine, Map<String, Float> minTimes) {
             if (!minTimes.containsKey(end)) {
                 System.out.println("No route found from " + start + " to " + end);
                 return;
             }
 
-            //The main backtracking to build the path ting man i hate this
+            //Building the path ting 
             List<String> route = new ArrayList<>();
             List<String> lines = new ArrayList<>();
             String current = end;
